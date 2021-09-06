@@ -6,7 +6,7 @@ import (
 	"github.com/onrik/logrus/filename"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	admissionv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	admissionv1 "k8s.io/api/admissionregistration/v1"
 )
 
 var (
@@ -35,7 +35,7 @@ var (
 		crds               []string
 	}{}
 
-	failurePolicy admissionv1beta1.FailurePolicyType
+	failurePolicy admissionv1.FailurePolicyType
 )
 
 // Execute is the main entry point for the program

@@ -6,7 +6,7 @@ import (
 	"github.com/jet/kube-webhook-certgen/pkg/k8s"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	admissionv1beta1 "k8s.io/api/admissionregistration/v1beta1"
+	admissionv1 "k8s.io/api/admissionregistration/v1"
 )
 
 var (
@@ -29,7 +29,7 @@ func prePatchCommand(cmd *cobra.Command, args []string) {
 		break
 	case "Ignore":
 	case "Fail":
-		failurePolicy = admissionv1beta1.FailurePolicyType(cfg.patchFailurePolicy)
+		failurePolicy = admissionv1.FailurePolicyType(cfg.patchFailurePolicy)
 		break
 	default:
 		log.Fatalf("patch-failure-policy %s is not valid", cfg.patchFailurePolicy)
@@ -45,7 +45,7 @@ func patchCommand(_ *cobra.Command, _ []string) {
 		log.Fatalf("no secret with '%s' in '%s'", cfg.secretName, cfg.namespace)
 	}
 
-	log.Println("config= %#v", cfg)
+	log.Printf("config= %#v", cfg)
 	k.PatchWebhookConfigurations(cfg.webhookName, ca, &failurePolicy, cfg.patchMutating, cfg.patchValidating, cfg.namespace, cfg.crds)
 }
 
