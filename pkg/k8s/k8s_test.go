@@ -125,8 +125,29 @@ func TestPatchWebhookConfigurations(t *testing.T) {
 			Webhooks: []admissionv1.ValidatingWebhook{{Name: "v1"}, {Name: "v2"}}}, metav1.CreateOptions{})
 
 	// create crd step for fake client query
-	var crds []string
-	crds = append(crds, "applications.core.oam.dev")
+	var port int32 = 443
+	path := "/convert"
+	crdConversion := CRDConversion{
+		Name: "applications.core.oam.dev",
+		Conversion: &crdv1.CustomResourceConversion{
+			Strategy: "Webhook",
+			Webhook: &crdv1.WebhookConversion{
+				ClientConfig: &crdv1.WebhookClientConfig{
+					Service: &crdv1.ServiceReference{
+						Namespace: "vela-core-webhook",
+						Name:      "vela-system",
+						Path:      &path,
+						Port:      &port,
+					},
+				},
+				ConversionReviewVersions: []string{
+					"v1beta1",
+					"v1alpha2",
+				},
+			}},
+	}
+	crdsConversion := []*CRDConversion{&crdConversion}
+
 	PolicyType := admissionv1.FailurePolicyType("ignore")
 	patchNamespace := "test-vela-ns"
 
@@ -146,7 +167,7 @@ func TestPatchWebhookConfigurations(t *testing.T) {
 		log.WithField("err", err).Fatal("failed to generate CRD")
 	}
 
-	k.PatchWebhookConfigurations(testWebhookName, ca, &PolicyType, true, true, patchNamespace, crds)
+	k.PatchWebhookConfigurations(testWebhookName, ca, &PolicyType, true, true, patchNamespace, crdsConversion)
 
 	//  crd check step
 	var crd = "applications.core.oam.dev"
