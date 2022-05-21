@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"k8s.io/apimachinery/pkg/util/json"
 	"os"
 
 	"github.com/jet/kube-webhook-certgen/pkg/k8s"
@@ -38,6 +39,17 @@ func prePatchCommand(cmd *cobra.Command, args []string) {
 }
 
 func patchCommand(_ *cobra.Command, _ []string) {
+	var crdsConversion []*k8s.CRDConversion
+	for i := 0; i < len(cfg.crds); i++ {
+		var Conversion k8s.CRDConversion
+		err := json.Unmarshal([]byte(cfg.crds[i]), &Conversion)
+		if err != nil {
+			log.Fatalf("CRD Conversion: %s Unmarshal err: %s", cfg.crds[i], err)
+		}
+		crdsConversion = append(crdsConversion, &Conversion)
+	}
+	cfg.crdsConversion = crdsConversion
+
 	k := k8s.New(cfg.kubeconfig)
 	ca := k.GetCaFromSecret(cfg.secretName, cfg.namespace)
 
@@ -46,7 +58,7 @@ func patchCommand(_ *cobra.Command, _ []string) {
 	}
 
 	log.Println("config= %#v", cfg)
-	k.PatchWebhookConfigurations(cfg.webhookName, ca, &failurePolicy, cfg.patchMutating, cfg.patchValidating, cfg.namespace, cfg.crds)
+	k.PatchWebhookConfigurations(cfg.webhookName, ca, &failurePolicy, cfg.patchMutating, cfg.patchValidating, cfg.namespace, cfg.crdsConversion)
 }
 
 func init() {
@@ -57,7 +69,8 @@ func init() {
 	patch.Flags().BoolVar(&cfg.patchValidating, "patch-validating", true, "If true, patch validatingwebhookconfiguration")
 	patch.Flags().BoolVar(&cfg.patchMutating, "patch-mutating", true, "If true, patch mutatingwebhookconfiguration")
 	patch.Flags().StringVar(&cfg.patchFailurePolicy, "patch-failure-policy", "", "If set, patch the webhooks with this failure policy. Valid options are Ignore or Fail")
-	patch.Flags().StringSliceVar(&cfg.crds, "crds", []string{}, "if set, will patch crd conversion.webhook.clientConfig.caBundle with the generated ca in secret")
+	//patch.Flags().StringSliceVar(&cfg.crds, "crds", []string{}, "if set, will patch crd conversion.webhook.clientConfig.caBundle with the generated ca in secret")
+	patch.Flags().StringArrayVar(&cfg.crds, "crds", []string{}, "if set, will patch crd conversion.webhook.clientConfig.caBundle with the generated ca in secret")
 	patch.MarkFlagRequired("secret-name")
 	patch.MarkFlagRequired("namespace")
 	patch.MarkFlagRequired("webhook-name")

@@ -3,10 +3,11 @@ package cmd
 import (
 	"os"
 
-	admissionv1 "k8s.io/api/admissionregistration/v1"
+	"github.com/jet/kube-webhook-certgen/pkg/k8s"
 	"github.com/onrik/logrus/filename"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	admissionv1 "k8s.io/api/admissionregistration/v1"
 )
 
 var (
@@ -33,6 +34,7 @@ var (
 		patchFailurePolicy string
 		kubeconfig         string
 		crds               []string
+		crdsConversion     []*k8s.CRDConversion
 	}{}
 
 	failurePolicy admissionv1.FailurePolicyType
