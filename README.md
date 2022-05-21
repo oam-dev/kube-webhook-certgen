@@ -1,11 +1,13 @@
-[![Build Status](https://dev.azure.com/jet-opensource/opensource/_apis/build/status/kube-webhook-certgen/kube-webhook-certgen.master?branchName=master)](https://dev.azure.com/jet-opensource/opensource/_build/latest?definitionId=15&branchName=master)
-[![Go Report Card](https://goreportcard.com/badge/github.com/jet/kube-webhook-certgen)](https://goreportcard.com/report/github.com/jet/kube-webhook-certgen)
-[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/jet/kube-webhook-certgen?sort=semver)](https://github.com/jet/kube-webhook-certgen/releases/latest)
-[![Docker Pulls](https://img.shields.io/docker/pulls/jettech/kube-webhook-certgen?color=blue)](https://hub.docker.com/r/jettech/kube-webhook-certgen/tags)
+[![Go Report Card](https://goreportcard.com/badge/github.com/oam-dev/kube-webhook-certgen)](https://goreportcard.com/report/github.com/oam-dev/kube-webhook-certgen)
+[![GitHub release (latest SemVer)](https://img.shields.io/github/v/release/oam-dev/kube-webhook-certgen?sort=semver)](https://github.com/jet/kube-webhook-certgen/releases/latest)
+[![Docker Pulls](https://img.shields.io/docker/pulls/oamdev/kube-webhook-certgen?color=blue)](https://hub.docker.com/r/oamdev/kube-webhook-certgen/tags)
 
 # Kubernetes webhook certificate generator and patcher
 
+This is a fork from https://github.com/jet/kube-webhook-certgen . We have customized functionality for KubeVela.
+
 ## Overview
+
 Generates a CA and leaf certificate with a long (100y) expiration, then patches [Kubernetes Admission Webhooks](https://kubernetes.io/docs/reference/access-authn-authz/extensible-admission-controllers/)
 by setting the `caBundle` field with the generated CA. 
 Can optionally patch the hooks `failurePolicy` setting - useful in cases where a single Helm chart needs to provision resources
@@ -68,6 +70,7 @@ Usage:
   kube-webhook-certgen patch [flags]
 
 Flags:
+      --crds stringArray              if set, will patch crd conversion.webhook.clientConfig.caBundle with the generated ca in secret
   -h, --help                          help for patch
       --namespace string              Namespace of the secret where certificate information will be read from
       --patch-failure-policy string   If set, patch the webhooks with this failure policy. Valid options are Ignore or Fail
@@ -78,9 +81,7 @@ Flags:
 
 Global Flags:
       --kubeconfig string   Path to kubeconfig file: e.g. ~/.kube/kind-config-kind
-      --log-format string   Log format: text|json (default "text")
+      --log-format string   Log format: text|json (default "json")
       --log-level string    Log level: panic|fatal|error|warn|info|debug|trace (default "info")
 ```
 
-## Known Users
-- [stable/prometheus-operator](https://github.com/helm/charts/tree/master/stable/prometheus-operator) helm chart
