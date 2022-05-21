@@ -24,6 +24,4 @@ FROM gcr.io/distroless/static
 WORKDIR /
 COPY --from=builder /workspace/kube-webhook-certgen /kube-webhook-certgen
 
-ENTRYPOINT ["/manager"]
-#COPY kube-webhook-certgen /kube-webhook-certgen
 ENTRYPOINT ["/kube-webhook-certgen"]
