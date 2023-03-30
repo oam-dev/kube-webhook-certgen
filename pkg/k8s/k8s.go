@@ -12,7 +12,6 @@ import (
 	k8sruntime "k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
-	ctr "sigs.k8s.io/controller-runtime"
 	"sigs.k8s.io/controller-runtime/pkg/client"
 
 	oamapi "github.com/oam-dev/kubevela-core-api/apis/core.oam.dev"
@@ -49,7 +48,7 @@ func New(kubeconfig string) *k8s {
 		log.WithError(err).Fatal("error creating kubernetes client")
 	}
 
-	cc, err := client.New(ctr.GetConfigOrDie(), client.Options{Scheme: Scheme})
+	cc, err := client.New(config, client.Options{Scheme: Scheme})
 	if err != nil {
 		log.WithError(err).Fatal("error creating controller runtime client")
 	}
